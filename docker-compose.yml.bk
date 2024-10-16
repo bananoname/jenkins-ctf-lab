@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  jenkins:
+    image: jenkins/jenkins:2.441-jdk17
+    container_name: jenkins-ctf
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    restart: on-failure
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ./jenkins_init.groovy:/var/jenkins_home/init.groovy.d/jenkins_init.groovy
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+
+volumes:
+  jenkins_home:
+

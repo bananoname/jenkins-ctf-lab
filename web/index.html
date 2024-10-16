@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trường Đại Học Công Nghệ XYZ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Trường Đại Học Công Nghệ XYZ</h1>
+    </header>
+    
+    <nav>
+        <a href="#about">Giới Thiệu</a>
+        <a href="#programs">Chương Trình Đào Tạo</a>
+        <a href="#events">Sự Kiện</a>
+        <a href="#contact">Liên Hệ</a>
+    </nav>
+    
+    <div class="container">
+        <section id="about">
+            <h2>Chào Mừng Đến Với Trường Đại Học Công Nghệ XYZ</h2>
+            <p>Trường chúng tôi cam kết mang lại nền giáo dục chất lượng cao và môi trường học tập hiện đại.</p>
+            
+            <!-- Flag 1: Ẩn trong nội dung HTML -->
+            <div class="hidden-flag">
+                FLAG{HTML_Secret_Flag_1234}
+            </div>
+        </section>
+        
+        <section id="programs">
+            <h2>Chương Trình Đào Tạo</h2>
+            <p>Chúng tôi cung cấp nhiều khóa học đa dạng về công nghệ thông tin, kỹ thuật phần mềm, và nhiều lĩnh vực khác.</p>
+        </section>
+        
+        <section id="events">
+            <h2>Hình Ảnh Sự Kiện</h2>
+            <img src="images/secret.png" alt="Sự kiện 2024">
+        </section>
+        
+        <section id="search-flag">
+            <h2>Thách Thức 4: Dò Tìm Flag Trên Trang Chủ</h2>
+            <p>Hãy tìm các flag ẩn trên trang này bằng cách sử dụng công cụ Developer Tools của trình duyệt hoặc các phương pháp dò tìm khác.</p>
+            
+            <!-- Form Tìm Kiếm -->
+            <form id="search-form">
+                <input type="text" id="search-input" placeholder="Nhập từ khóa tìm kiếm..." required>
+                <button type="submit">Tìm Kiếm</button>
+            </form>
+        </section>
+        
+        <!-- Thêm Thách Thức 5: Tìm Flag trong Metadata Hình Ảnh -->
+        <section id="image-metadata-flag">
+            <h2>Thách Thức 5: Tìm Flag Trong Metadata Hình Ảnh</h2>
+            <p>Hãy tìm và khai thác flag trong metadata của hình ảnh trên trang này.</p>
+            <button onclick="showFlagMetadata()">Tìm Flag</button>
+        </section>
+    </div>
+    
+    <!-- Flag 3: Sử dụng JavaScript để ẩn flag -->
+    <script>
+        // Script để hiển thị flag khi tìm thấy
+        function showFlag() {
+            var flag = "FLAG{JavaScript_Secret_Flag_5678}";
+            console.log("Bạn đã tìm thấy flag: " + flag);
+        }
+        
+        // Kích hoạt flag khi người dùng thực hiện tìm kiếm
+        document.getElementById("search-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Ngăn form gửi đi và tải lại trang
+            showFlag();
+        });
+        
+        // Kích hoạt flag khi người dùng nhấn vào nút
+        function showFlagMetadata() {
+            var flag = "FLAG{Metadata_Image_Flag_3456}";
+            alert("Bạn đã tìm thấy flag: " + flag);
+        }
+    </script>
+    
+    <footer>
+        <p>&copy; 2024 Trường Đại Học Công Nghệ XYZ. Bảo lưu mọi quyền.</p>
+    </footer>
+</body>
+</html>
+

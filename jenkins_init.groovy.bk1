@@ -1,0 +1,110 @@
+import jenkins.model.*
+import hudson.security.*
+import java.util.logging.Logger
+import java.util.Random
+
+def logger = Logger.getLogger("")
+
+// Cài đặt plugin
+def instance = Jenkins.getInstance()
+def pluginManager = instance.getPluginManager()
+def updateCenter = instance.getUpdateCenter()
+
+updateCenter.updateAllSites()
+updateCenter.getPlugin("git").deploy()
+updateCenter.getPlugin("workflow-aggregator").deploy()
+updateCenter.getPlugin("credentials").deploy()
+updateCenter.getPlugin("docker-plugin").deploy()
+updateCenter.getPlugin("job-dsl").deploy()
+updateCenter.getPlugin("configuration-as-code").deploy()
+// Thêm các plugin khác nếu cần thiết
+
+// Đợi plugins được cài đặt hoàn toàn
+instance.save()
+
+// Cấu hình bảo mật
+def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+hudsonRealm.createAccount("admin", "admin") // Username: admin, Password: admin
+instance.setSecurityRealm(hudsonRealm)
+
+def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+strategy.setAllowAnonymousRead(false)
+instance.setAuthorizationStrategy(strategy)
+
+instance.save()
+
+// Tạo thư mục lưu trữ flags
+def flagsDir = new File(instance.getRootDir(), "flags")
+if (!flagsDir.exists()) {
+    flagsDir.mkdirs()
+}
+
+// Hàm tạo một flag ngẫu nhiên
+def generateFlag() {
+    def chars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+    def flag = 'FLAG{' + (1..16).collect { chars[new Random().nextInt(chars.size())] }.join() + '}'
+    return flag
+}
+
+// Tạo các Pipeline cho CTF
+def createCTFJob(jobName, challengeDescription) {
+    def job = Jenkins.instance.createProject(org.jenkinsci.plugins.workflow.job.WorkflowJob, jobName)
+    job.definition = new org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition(
+        """
+        pipeline {
+            agent any
+            stages {
+                stage('Challenge Description') {
+                    steps {
+                        echo '${challengeDescription}'
+                    }
+                }
+                stage('Execute Challenge') {
+                    steps {
+                        // Thêm các bước thử thách cụ thể tại đây
+                        // Ví dụ: thực thi một script, chạy một ứng dụng, v.v.
+                        echo 'Running the challenge...'
+                    }
+                }
+                stage('Complete Challenge') {
+                    steps {
+                        script {
+                            // Kiểm tra điều kiện hoàn thành thách thức
+                            // Nếu hoàn thành, hiển thị flag
+                            // Đây là ví dụ đơn giản, bạn cần thay đổi theo logic thực tế của thách thức
+                            def flag = readFile('flags/${jobName}.txt').trim()
+                            echo "Congratulations! Your flag is: \${flag}"
+                        }
+                    }
+                }
+            }
+            post {
+                success {
+                    echo 'Challenge Completed Successfully!'
+                }
+                failure {
+                    echo 'Challenge Failed!'
+                }
+            }
+        }
+        """,
+        true
+    )
+    job.save()
+
+    // Tạo flag cho thách thức và lưu vào file
+    def flag = generateFlag()
+    def flagFile = new File(flagsDir, "${jobName}.txt")
+    flagFile.text = flag
+}
+
+// Tạo các thách thức CTF
+createCTFJob("CTF_Challenge_1", "Thách thức 1: Khai thác lỗ hổng SQL Injection.")
+createCTFJob("CTF_Challenge_2", "Thách thức 2: Xâm nhập vào hệ thống bằng cách khai thác XSS.")
+createCTFJob("CTF_Challenge_3", "Thách thức 3: Tìm và khai thác lỗ hổng RCE.")
+// Thêm nhiều thách thức hơn nếu cần
+createCTFJob("CTF_Challenge_4", "Thách thức 4: Khai thác lỗ hổng CSRF.")
+createCTFJob("CTF_Challenge_5", "Thách thức 5: Xâm nhập vào hệ thống bằng cách khai thác Directory Traversal.")
+
+instance.save()
+
