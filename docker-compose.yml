@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   jenkins:
-    image: jenkins/jenkins:2.441-jdk17
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
     container_name: jenkins-ctf
     ports:
       - "8080:8080"
@@ -22,9 +24,18 @@ services:
       - "80:80"
     restart: on-failure
     volumes:
+      - ./web/nginx/snippets:/etc/nginx/snippets
+      - ./web/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./web:/usr/share/nginx/html:ro
     depends_on:
       - jenkins
+      - php
+
+  php:
+    image: php:7.4-fpm
+    container_name: php-fpm
+    volumes:
+      - ./web:/usr/share/nginx/html
 
 volumes:
   jenkins_home:

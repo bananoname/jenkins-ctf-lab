@@ -1,0 +1,19 @@
+FROM jenkins/jenkins:2.441-jdk17
+
+USER root
+
+# Cài đặt các gói cần thiết
+RUN apt-get update && apt-get install -y \
+    nano \
+    wget \
+    curl \
+    && apt-get clean
+
+# Cài đặt NVM
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh | bash && \
+    export NVM_DIR="$HOME/.nvm" && \
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
+    nvm install --lts
+
+USER jenkins
+

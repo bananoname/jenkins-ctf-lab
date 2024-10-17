@@ -1,12 +1,11 @@
 import jenkins.model.*
 import hudson.security.*
 import java.util.logging.Logger
-import hudson.model.User
-import hudson.tasks.Mailer
+import java.util.Random
 
-def logger = Logger.getLogger("") // Log messages for tracking actions
+def logger = Logger.getLogger("")
 
-// Cài đặt và cấu hình Jenkins instance
+// Cài đặt plugin
 def instance = Jenkins.getInstanceOrNull()
 if (instance == null) {
     throw new IllegalStateException("Jenkins instance is not available")
@@ -27,11 +26,11 @@ def requiredPlugins = [
     "job-dsl",
     "configuration-as-code",
     "pipeline-stage-view",
-    "blueocean",
-    "mailer" // Plugin gửi email khi có thông báo về job
+    "blueocean"
+    // Thêm các plugins khác nếu cần thiết
 ]
 
-// Cài đặt các plugins nếu chưa được cài
+// Cài đặt các plugins
 requiredPlugins.each { pluginShortName ->
     if (!pluginManager.getPlugin(pluginShortName)) {
         def plugin = updateCenter.getPlugin(pluginShortName)
@@ -46,40 +45,21 @@ requiredPlugins.each { pluginShortName ->
     }
 }
 
-// Đợi các plugin cài đặt hoàn toàn
+// Đợi các plugins được cài đặt hoàn toàn
 instance.save()
 
-// Cấu hình bảo mật cho Jenkins
+// Cấu hình bảo mật
 def hudsonRealm = new HudsonPrivateSecurityRealm(false)
-hudsonRealm.createAccount("admin", "admin123") // Admin mặc định
-hudsonRealm.createAccount("jenny", "jennyPassword") // Người dùng Jenny
-hudsonRealm.createAccount("john", "johnPassword")   // Người dùng John
+hudsonRealm.createAccount("admin", "admin") // Username: admin, Password: admin
 instance.setSecurityRealm(hudsonRealm)
 
-// Phân quyền bảo mật
 def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
-strategy.setAllowAnonymousRead(false) // Ngăn truy cập ẩn danh
-strategy.add(Jenkins.ADMINISTER, "admin")  // Admin có quyền quản trị
-strategy.add(Jenkins.ADMINISTER, "jenny")  // Jenny có quyền quản trị
-strategy.add(Jenkins.READ, "john")         // John chỉ có quyền đọc
+strategy.setAllowAnonymousRead(false)
 instance.setAuthorizationStrategy(strategy)
 
 instance.save()
 
-// Cấu hình email thông báo khi hoàn thành job
-def adminUser = User.getById("admin", true)
-adminUser.addProperty(new Mailer.UserProperty("admin@company.com"))
-logger.info("Configured email for admin: admin@company.com")
-
-def jennyUser = User.getById("jenny", true)
-jennyUser.addProperty(new Mailer.UserProperty("jenny@company.com"))
-logger.info("Configured email for jenny: jenny@company.com")
-
-def johnUser = User.getById("john", true)
-johnUser.addProperty(new Mailer.UserProperty("john@company.com"))
-logger.info("Configured email for john: john@company.com")
-
-// Tạo thư mục lưu trữ flags cho các thử thách
+// Tạo thư mục lưu trữ flags
 def flagsDirPath = "${instance.getRootDir()}/flags"
 def flagsDir = new File(flagsDirPath)
 if (!flagsDir.exists()) {
@@ -95,17 +75,6 @@ def generateFlag() {
     def flag = 'FLAG{' + (1..16).collect { chars[new Random().nextInt(chars.size())] }.join() + '}'
     return flag
 }
-
-// Hàm kiểm tra trạng thái Jenkins, chỉ chạy khi hệ thống ổn định
-def checkSystemHealth() {
-    def healthReports = instance.getOverallLoad().getLoadStatistics()
-    if (healthReports.size() > 0) {
-        logger.info("Jenkins system is healthy with no major issues.")
-    } else {
-        logger.warning("System health reports show potential issues.")
-    }
-}
-checkSystemHealth()
 
 // Hàm tạo Pipeline Job cho CTF
 def createCTFJob(jobName, challengeDescription, isWebChallenge = false) {
@@ -128,18 +97,21 @@ def createCTFJob(jobName, challengeDescription, isWebChallenge = false) {
                     }
                     stage('Execute Challenge') {
                         steps {
-                            echo 'Access the homepage to search for the flag.'
+                            // Thêm các bước thử thách cụ thể tại đây
+                            echo 'Hãy truy cập trang chủ để tìm kiếm flag.'
                         }
                     }
                     stage('Complete Challenge') {
                         steps {
                             script {
+                                // Kiểm tra điều kiện hoàn thành thách thức
+                                // Nếu hoàn thành, hiển thị flag
                                 def flagFile = "${flagsDirPath}/${jobName}/flag.txt"
                                 if (fileExists(flagFile)) {
                                     def flag = readFile(flagFile).trim()
-                                    echo "Congratulations! Your flag is: \${flag}"
+                                    echo "Chúc mừng! Flag của bạn là: \${flag}"
                                 } else {
-                                    echo "Flag file not found!"
+                                    echo "Không tìm thấy flag file!"
                                 }
                             }
                         }
@@ -148,11 +120,9 @@ def createCTFJob(jobName, challengeDescription, isWebChallenge = false) {
                 post {
                     success {
                         echo 'Challenge Completed Successfully!'
-                        mail to: 'admin@company.com', subject: "Job Completed: ${jobName}", body: "Challenge completed successfully."
                     }
                     failure {
                         echo 'Challenge Failed!'
-                        mail to: 'admin@company.com', subject: "Job Failed: ${jobName}", body: "Challenge failed. Please check the logs."
                     }
                 }
             }
@@ -172,7 +142,8 @@ def createCTFJob(jobName, challengeDescription, isWebChallenge = false) {
                     }
                     stage('Execute Challenge') {
                         steps {
-                            echo 'Executing challenge...'
+                            echo 'Running the challenge...'
+                            // Giả lập một bước thực thi thành công
                         }
                     }
                     stage('Complete Challenge') {
@@ -181,9 +152,9 @@ def createCTFJob(jobName, challengeDescription, isWebChallenge = false) {
                                 def flagFile = "${flagsDirPath}/${jobName}/flag.txt"
                                 if (fileExists(flagFile)) {
                                     def flag = readFile(flagFile).trim()
-                                    echo "Congratulations! Your flag is: \${flag}"
+                                    echo "Chúc mừng! Flag của bạn là: \${flag}"
                                 } else {
-                                    echo "Flag file not found!"
+                                    echo "Không tìm thấy flag file!"
                                 }
                             }
                         }
@@ -192,11 +163,9 @@ def createCTFJob(jobName, challengeDescription, isWebChallenge = false) {
                 post {
                     success {
                         echo 'Challenge Completed Successfully!'
-                        mail to: 'admin@company.com', subject: "Job Completed: ${jobName}", body: "Challenge completed successfully."
                     }
                     failure {
                         echo 'Challenge Failed!'
-                        mail to: 'admin@company.com', subject: "Job Failed: ${jobName}", body: "Challenge failed. Please check the logs."
                     }
                 }
             }
@@ -220,13 +189,13 @@ def createCTFJob(jobName, challengeDescription, isWebChallenge = false) {
     logger.info("Created flag for ${jobName}: ${flag}")
 }
 
-// Tạo các thách thức CTF với nhiều thể loại khác nhau
-createCTFJob("CTF_SQL_Injection", "Challenge 1: Exploit SQL Injection vulnerability.")
-createCTFJob("CTF_XSS_Attack", "Challenge 2: Exploit XSS to gain unauthorized access.")
-createCTFJob("CTF_RCE_Attack", "Challenge 3: Find and exploit the RCE vulnerability.")
+// Tạo các thách thức CTF
+createCTFJob("CTF_Challenge_1", "Thách thức 1: Khai thác lỗ hổng SQL Injection.")
+createCTFJob("CTF_Challenge_2", "Thách thức 2: Xâm nhập vào hệ thống bằng cách khai thác XSS.")
+createCTFJob("CTF_Challenge_3", "Thách thức 3: Tìm và khai thác lỗ hổng RCE.")
 
-// Tạo thêm thách thức dò tìm flag trên trang chủ
-createCTFJob("CTF_Homepage_Flag_Search", "Challenge 4: Find the hidden flag on the school homepage.", true)
+// Tạo thách thức mới: Dò tìm flag trên trang chủ
+createCTFJob("CTF_Homepage_Search", "Thách thức 4: Dò tìm flag trên trang chủ giới thiệu về trường học.", true)
 
 instance.save()
 

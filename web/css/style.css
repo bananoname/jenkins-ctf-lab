@@ -1,102 +1,130 @@
-/* web/css/style.css */
-
+/* style.css */
+/* Thêm vào style.css */
+.hidden-flag {
+    display: none; /* Ẩn phần tử */
+}
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
-    color: #333;
+    display: flex; /* Sử dụng Flexbox cho body */
+    flex-direction: column; /* Đặt chiều dọc */
+    height: 100vh; /* Chiều cao 100% viewport */
 }
 
 header {
-    background-color: #35424a;
-    color: #ffffff;
+    background-color: #004080;
     padding: 20px 0;
-    text-align: center;
+    color: white;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 2.5em;
-}
-
-nav {
-    background-color: #e8491d;
-    overflow: hidden;
-}
-
-nav a {
-    float: left;
-    display: block;
-    color: #ffffff;
-    text-align: center;
-    padding: 14px 20px;
-    text-decoration: none;
-}
-
-nav a:hover {
-    background-color: #ffffff;
-    color: #e8491d;
-}
-
-.container {
-    padding: 20px;
-}
-
-h2 {
-    color: #e8491d;
-}
-
-.hidden-flag {
-    display: none;
-}
-
-footer {
-    background-color: #35424a;
-    color: #ffffff;
-    text-align: center;
-    padding: 10px 0;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-}
-
-button {
-    background-color: #35424a;
-    color: #ffffff;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    font-size: 1em;
-    border-radius: 5px;
-}
-
-button:hover {
-    background-color: #e8491d;
-}
-
-img {
-    max-width: 100%;
-    height: auto;
-    display: block;
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
     margin: 0 auto;
 }
 
-/* Định dạng cho form tìm kiếm */
-form#search-form {
-    margin-top: 20px;
+.logo img {
+    width: 150px;
 }
 
-form#search-form input[type="text"] {
-    padding: 10px;
-    width: 70%;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em;
+.navbar ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
 }
 
-form#search-form button {
+.navbar ul li {
+    margin-right: 20px;
+}
+
+.navbar ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.search-bar input {
+    padding: 5px;
+}
+
+.search-bar button {
+    padding: 5px 10px;
+    background-color: #ffcc00;
+    border: none;
+    cursor: pointer;
+}
+
+main {
+    width: 90%;
+    margin: 20px auto;
+    flex: 1; /* Cho phép main chiếm không gian còn lại */
+}
+
+.intro {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.intro h1 {
+    color: #004080;
+}
+
+.intro p {
+    font-size: 18px;
+}
+
+.cta-button {
+    background-color: #ffcc00;
     padding: 10px 20px;
+    color: #004080;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.news, .events {
+    margin-bottom: 40px;
+}
+
+h2 {
+    color: #004080;
+}
+
+.news-items article {
+    margin-bottom: 20px;
+}
+
+footer {
+    background-color: #004080;
+    color: white;
+    padding: 20px 0;
+}
+
+.footer-container {
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.social-links a img {
+    width: 30px;
     margin-left: 10px;
 }
+.hidden-flag {
+    color: transparent; /* Ẩn văn bản */
+    width: 0; /* Chiều rộng bằng 0 */
+    height: 0; /* Chiều cao bằng 0 */
+    overflow: hidden; /* Ẩn bất kỳ nội dung nào ngoài chiều cao và chiều rộng */
+    position: absolute; /* Đặt nó ra ngoài luồng văn bản */
+}
 
+.hidden-flag::after {
+    content: "FLAG{Hidden_in_CSS_1234}"; /* Flag ẩn */
+    color: #fff; /* Màu sắc giống nền */
+}
